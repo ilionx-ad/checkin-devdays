@@ -1,9 +1,16 @@
 <template>
     <div>
+        <!-- Text input  -->
         <input :aria-label="(config.i18n[lang()] && config.i18n[lang()].inputTitle) || config.i18n[config.app.fallback_lang].inputTitle" class="input" type="text" :placeholder="(config.i18n[lang()] && config.i18n[lang()].inputTitle) || config.i18n[config.app.fallback_lang].inputTitle" v-model="query" @keypress.enter="submit()" />
+        <!-- Microphone Button --><br/><br/>
+        <div :aria-label="(config.i18n[lang()] && config.i18n[lang()].microphoneTitle) || config.i18n[config.app.fallback_lang].microphoneTitle" :title="(config.i18n[lang()] && config.i18n[lang()].microphoneTitle) || config.i18n[config.app.fallback_lang].microphoneTitle" class="button-container mic_button" :class="{'mic_active': micro}" @click="micro = !micro">
+            <i class="material-icons" aria-hidden="true">Click here to enable mic</i>
+        </div>
+        <!-- Result --><br/>
         <div class="result">
             Show response: {{answer}}
         </div>   
+ 
     </div>
      
 </template>
@@ -24,7 +31,9 @@ export default {
             muted: this.config.app.muted,
             loading: false,
             query: '',
-            answer: ''
+            answer: '',
+            micro: false,
+            recognition: null
         }
     },
     created(){
@@ -54,9 +63,15 @@ export default {
                 return response.json()
             })
             .then(agent => {
-                this.app = agent
+                this.app = agent 
                 if(this.history()) localStorage.setItem('agent', JSON.stringify(agent))
             })
+        }
+
+        if(window.webkitSpeechRecognition || window.SpeechRecognition ){
+            this.recognition = new webkitSpeechRecognition() || new SpeechRecognition()
+            this.recognition.interimResults = true
+            this.recognition.lang = this.lang()
         }
     },
     computed: {
@@ -90,6 +105,28 @@ export default {
         loading(){
             // <- wait for render (timeout) and then smoothly scroll #app down to #bottom selector, used as anchor
         },
+        /* This function triggers when user clicks on the microphone button */
+        micro(bool){
+            if(bool){
+                /* When value is true, start voice recognition */
+                this.recognition.start()
+                this.recognition.onresult = (event) => {
+                    for (let i = event.resultIndex; i < event.results.length; ++i){
+                        this.query = event.results[i][0].transcript // <- push results to the Text input
+                    }
+                }
+
+                this.recognition.onend = () => {
+                    this.recognition.stop()
+                    this.micro = false
+                    this.submit(this.query) // <- submit the result
+                }
+            }
+
+            else {
+                this.recognition.abort() // <- if user stops the recognition, abort it (in V1 this prevented users from starting a new recording)
+            }
+        }
     },
     methods: {
         send(q){
