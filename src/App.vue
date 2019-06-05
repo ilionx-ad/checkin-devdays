@@ -1,10 +1,6 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+      <DialogFlow />
   </div>
 </template>
 
@@ -27,3 +23,14 @@
   }
 }
 </style>
+
+<script>
+  import DialogFlow from './components/DialogFlow/DialogFlow.vue'
+
+  export default{
+    name: 'app',
+    components: {
+      DialogFlow
+    }
+  }
+</script>
