@@ -1,29 +1,48 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <div class="check-in">
+    <Header />
+    <div class="check-in__inner">
+      <div class="check-in__content">
+        <router-view/>
+      </div>
     </div>
-    <router-view/>
   </div>
 </template>
 
 <style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+  .check-in {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url(assets/x-background.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+
+    &__inner {
+      max-width: $container;
+      width: 100%;
+      margin: 0 auto;
+      padding: 70px 15px 0 15px;
+    }
+
+    &__content {
+      width: 66.66667%;
     }
   }
-}
 </style>
+
+
+<script>
+import Header from '@/components/Header.vue'
+
+export default {
+  components: {
+    Header
+  }
+}
+</script>
+
