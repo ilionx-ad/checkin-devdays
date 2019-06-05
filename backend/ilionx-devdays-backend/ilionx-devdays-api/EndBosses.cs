@@ -15,8 +15,32 @@ namespace ilionx_devdays_api
         [FunctionName("EndBosses")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [CosmosDB(
+                databaseName: "tododb",
+                collectionName: "tasks",
+                ConnectionStringSetting = "CosmosDBConnection")]
+            IAsyncCollector<object> todos,
             ILogger log)
         {
+
+            // TODO: https://github.com/markheath/funcs-todo-csharp/blob/master/AzureFunctionsTodo/CosmosDb/TodoApiCosmosDb.cs
+            // AND: https://markheath.net/post/azure-functions-rest-csharp-bindings
+            if (req.Method.ToLowerInvariant() == "post")
+            {
+                log.LogInformation("Creating a new end boss");
+                string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                dynamic input = JsonConvert.DeserializeObject(requestBody);
+
+                if (input == null || input.id == null) {
+                    new BadRequestObjectResult("Please pass a json object in the request body with at least a (lowercase) property id");
+                }
+
+                await todos.AddAsync(input);
+                return new OkObjectResult(input);
+            }
+
+            log.LogInformation($"C# Queue trigger function inserted one row");
+
             log.LogInformation($"C# HTTP trigger function processed a request in Function. {nameof(EndBosses)}");
 
             return (ActionResult)new OkObjectResult(new { EndBosses = "Representing!" });
