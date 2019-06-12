@@ -27,3 +27,16 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+# Back End
+
+```
+Azure functions, deployed by linking azure to GitHub. Data is stored as NoSql data in a CosmosDB
+
+REST CRUD operations possible for urls:
+
+- https://ilionx-devdays-welcome-api.azurewebsites.net/api/EndBosses
+
+Release status: [TODO]
+```
