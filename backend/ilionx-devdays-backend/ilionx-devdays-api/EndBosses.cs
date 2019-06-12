@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Microsoft.Azure.Documents.Client;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.Azure.Documents;
 
 namespace ilionx_devdays_api
 {
@@ -20,6 +21,7 @@ namespace ilionx_devdays_api
 
         private const string Route = "endbosses";
         private const string DatabaseName = "endbossesdb";
+        private const string PartitionKey = "/ilionxendbosses";
         private const string CollectionName = "ilionx-endbosses";
 
         [FunctionName("EndBosses_Create")]
@@ -55,6 +57,7 @@ namespace ilionx_devdays_api
                 databaseName: DatabaseName,
                 collectionName: CollectionName,
                 SqlQuery = "SELECT * FROM c order by c._ts desc",
+                PartitionKey = PartitionKey,
                 ConnectionStringSetting = "CosmosDBConnection")]
             IEnumerable<dynamic> endbosses,
             ILogger log)
@@ -65,17 +68,22 @@ namespace ilionx_devdays_api
 
         [FunctionName("EndBossById_Get")]
         public static IActionResult GetEndBossesById(
-    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = Route + "/{id}")] HttpRequest req,
-    [CosmosDB(
-                databaseName: DatabaseName,
-                collectionName: CollectionName,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = Route + "/{id}")] HttpRequest req,
+            [CosmosDB(PartitionKey = PartitionKey,
                 Id = "{id}",
                 ConnectionStringSetting = "CosmosDBConnection")]
-            dynamic endBoss,
-            ILogger log, string id)
+            DocumentClient client,
+            ILogger log, 
+            string id)
         {
             log.LogInformation("Getting end boss by id");
 
+            
+            var collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
+            var endBoss = client.CreateDocumentQuery(collectionUri, new FeedOptions { EnableCrossPartitionQuery = true })
+                            .Where(t => t.Id == id)
+                            .AsEnumerable()
+                            .FirstOrDefault();
             if (endBoss == null)
             {
                 log.LogInformation($"End boss with {id} not found");
@@ -87,7 +95,8 @@ namespace ilionx_devdays_api
         [FunctionName("EndBoss_Update")]
         public static async Task<IActionResult> UpdateTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = Route + "/{id}")]HttpRequest req,
-            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")]
+            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection",
+                PartitionKey = PartitionKey)]
                 DocumentClient client,
                 ILogger log, 
                 string id)
@@ -95,8 +104,10 @@ namespace ilionx_devdays_api
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic input = JsonConvert.DeserializeObject(requestBody);
             var collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-            var document = client.CreateDocumentQuery(collectionUri).Where(t => t.Id == id)
-                            .AsEnumerable().FirstOrDefault();
+            var document = client.CreateDocumentQuery(collectionUri, new FeedOptions { EnableCrossPartitionQuery = true })
+                            .Where(t => t.Id == id)
+                            .AsEnumerable()
+                            .FirstOrDefault();
             if (document == null)
             {
                 return new NotFoundResult();
@@ -118,12 +129,17 @@ namespace ilionx_devdays_api
         [FunctionName("EndBoss_Delete")]
         public static async Task<IActionResult> DeleteTodo(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = Route + "/{id}")]HttpRequest req,
-            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection")] DocumentClient client,
-            ILogger log, string id)
+            [CosmosDB(ConnectionStringSetting = "CosmosDBConnection", 
+                PartitionKey = PartitionKey)]
+            DocumentClient client,
+            ILogger log, 
+            string id)
         {
             Uri collectionUri = UriFactory.CreateDocumentCollectionUri(DatabaseName, CollectionName);
-            var document = client.CreateDocumentQuery(collectionUri).Where(t => t.Id == id)
-                    .AsEnumerable().FirstOrDefault();
+            var document = client.CreateDocumentQuery(collectionUri, new FeedOptions { EnableCrossPartitionQuery = true })
+                    .Where(t => t.Id == id)
+                    .AsEnumerable()
+                    .FirstOrDefault();
             if (document == null)
             {
                 return new NotFoundResult();
@@ -131,7 +147,7 @@ namespace ilionx_devdays_api
 
             log.LogInformation($"Deleting document with id {id}.");
 
-            await client.DeleteDocumentAsync(document.SelfLink);
+            await client.DeleteDocumentAsync(document.SelfLink, new RequestOptions() { PartitionKey = new PartitionKey(Undefined.Value) });
             return new OkResult();
         }
     }
