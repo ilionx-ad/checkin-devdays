@@ -7,7 +7,7 @@
       <br />ilionx DevDays 2019
     </h1>
     <h2>Laat weten dat je er bent!</h2>
-    <a class="button" @click="setIdInStorage()">Check nu in!</a>
+    <router-link @click="setIdInStorage()" class="button" to="/dialog">Check nu in!</router-link>
   </div>
 </template>
 
