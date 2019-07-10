@@ -4,6 +4,9 @@ const resource = "/EndBosses";
 const endBossID = sessionStorage.getItem("endBossID");
 
 export default {
+  getAll() {
+    return Repository.get(`${resource}`);
+  },
   get() {
     return Repository.get(`${resource}/${endBossID}`);
   },
