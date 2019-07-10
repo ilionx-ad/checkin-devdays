@@ -8,6 +8,8 @@
     </h1>
     <h2>Laat weten dat je er bent!</h2>
     <router-link @click="setIdInStorage()" class="button" to="/dialog">Check nu in!</router-link>
+    
+     <router-link class="button-small" to="/attendants">Wie zijn er allemaal?</router-link>
   </div>
 </template>
 

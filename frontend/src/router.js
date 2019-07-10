@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
-import Eindbazen from './views/Eindbazen.vue'
 import Attendants from './views/Attendants.vue'
 import DialogFlow from './components/DialogFlow/DialogFlow.vue'
 
@@ -15,11 +14,6 @@ export default new Router({
       path: '/',
       name: 'home',
       component: Home
-    },
-    {
-      path: '/eindbazen',
-      name: 'eindbazen',
-      component: Eindbazen
     },
     {
       path: '/attendants',
