@@ -6,6 +6,8 @@
         <dd>TODO: {{get(attendant, 'queryResult.parameters.name') || get(attendant, 'data')}}</dd>
         <dd>{{attendant.photo}}</dd>
     </dl>
+
+    <router-link class="button-small" to="/">terug</router-link>
   </div>
 </template>
 
