@@ -1,3 +1,4 @@
+
 <template>
   <div>
     <!-- Text input  -->
@@ -20,6 +21,7 @@
       @click="micro = !micro"
     >
       <i class="material-icons" aria-hidden="true">Click here to enable mic</i>
+      
     </div>
     <!-- Result -->
     <br>
