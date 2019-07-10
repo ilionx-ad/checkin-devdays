@@ -7,6 +7,9 @@
 </template>
 
 <style lang="scss" scoped>
+  .home {
+    align-self: center;
+  }
   h1, h2 {
     margin: 0;
   }
