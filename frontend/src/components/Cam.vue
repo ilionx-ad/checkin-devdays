@@ -13,13 +13,17 @@
         <div class="modal-body">
         <slot name="body"></slot>
         <div ref="box" class="video-box">
+            <h2 v-if="showTimer" class="counter">{{timeLeft}}</h2>
+            <h2 v-if="!showTimer" class="counter-cheese">{{timeText}}</h2>
             <canvas ref="canvas" id="canvas" width="640" height="480"></canvas>
             <video ref="video" id="video" width="640" height="480" autoplay></video>
             <div class="video-controls" ref="button">
                 <div class="video-snap">
+                    <!-- Handmatig een selfie maken
                     <button id="snap" class="btn-snap" v-on:click="capture()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+                        <img src="../assets/baseline-photo_camera-24px.svg" />
                     </button>
+                    -->
                 </div>
                 <a class="button button-close-modal" v-on:click="closeModal()">Annuleren</a>
             </div>
@@ -41,7 +45,13 @@ export default {
       return{
         video: {},
         canvas: {},
-        captures: []
+        captures: [],
+        selectedTime: 0,
+        timeText: 'Kaas!',
+        showTimer: true,
+        timeLeft: '0',
+        endTime: '0',
+        intervalTimer: null
       }
   },
   mounted() { 
@@ -57,23 +67,60 @@ export default {
                 this.video.play();            
             });
         }
+        this.capture();
+        
     },
     methods: { 
-        closeModal(){
-            this.$emit('close');
-            this.video = this.$refs.video;
-            let tracks = this.video.srcObject.getTracks();
+    setTime(seconds) {
+        clearInterval(this.intervalTimer);
+        this.timer(seconds);
+    },
+    timer(seconds) {
+        const now = Date.now();
+        const end = now + seconds * 1000;
+        this.displayTimeLeft(seconds);
 
-            tracks.forEach(function(track) {
-                track.stop();
-            });
+        this.selectedTime = seconds;
+        this.countdown(end);
+    },
+    countdown(end) {
+        intervalTimer = setInterval(() => {
+            const secondsLeft = Math.round((end - Date.now()) / 1000);
 
-            this.video.srcObject = null;
-            //this.getElementById(snap).display = "none";
-        },
-        capture() {
+            if(secondsLeft === 0) {
+                this.showTimer = false;
+                this.endTime = 0;
+            }
+
+            if(secondsLeft < 0) {
+                clearInterval(this.intervalTimer);
+                return;
+            }
+            this.displayTimeLeft(secondsLeft)
+        }, 1000);
+    },
+    displayTimeLeft(secondsLeft) {
+        const minutes = Math.floor((secondsLeft % 3600) / 60);
+        const seconds = secondsLeft % 60;
+
+        this.timeLeft = `${seconds}`;
+    },
+    closeModal(){
+        this.$emit('close');
+        this.video = this.$refs.video;
+        let tracks = this.video.srcObject.getTracks();
+
+        tracks.forEach(function(track) {
+            track.stop();
+        });
+
+        this.video.srcObject = null;
+    },
+    capture() {
+        this.setTime(3);
+        
         this.canvas = this.$refs.canvas; 
-               
+                
         var context = this.canvas.getContext("2d").drawImage(this.video, 0, 0, 640, 480);
         this.captures.push(canvas.toDataURL("image/webp"));
         this.video = this.$refs.video;
@@ -88,8 +135,6 @@ export default {
         this.video.hidden = true;
         this.$refs.button.hidden = true;
         this.$emit('close');  
-        //getElementById(snap).display = "none";
-        // this.video.srcObject.stop()
         }
         
     }
@@ -97,6 +142,18 @@ export default {
 </script>
 
 <style lang="scss">
+.counter-cheese{
+    position: absolute;
+    top: 15%;
+    left: 35%;
+    color: white;
+}
+.counter{
+    position: absolute;
+    top: 15%;
+    left: 45%;
+    color: white;
+}
 .modal-mask {
   position: fixed;
   z-index: 9998;
@@ -157,9 +214,12 @@ svg{
 .image-ul{
     list-style:none;
 }
-
+.video-box{
+    position:relative;
+}
 .video-snap{
     text-align: center;
+    padding-bottom:60px;
 }
 .video-controls{
     margin-top: -75px;
