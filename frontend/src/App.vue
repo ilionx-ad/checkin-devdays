@@ -19,7 +19,6 @@
     background-image: url(assets/x-background.png);
     background-repeat: no-repeat;
     background-size: cover;
-
     &__inner {
       max-width: $container;
       width: 100%;
