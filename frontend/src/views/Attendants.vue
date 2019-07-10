@@ -37,7 +37,6 @@ export default {
       async getEndbosses() {
           this.isLoading = true;
           const { data } = await repo.getAll();
-          console.log(data);
           this.isLoading = false;
           this.attendants = data;
       }
