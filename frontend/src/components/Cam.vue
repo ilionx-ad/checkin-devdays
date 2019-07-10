@@ -84,7 +84,7 @@ export default {
         this.countdown(end);
     },
     countdown(end) {
-        intervalTimer = setInterval(() => {
+        this.intervalTimer = setInterval(() => {
             const secondsLeft = Math.round((end - Date.now()) / 1000);
 
             if(secondsLeft === 0) {
@@ -120,7 +120,6 @@ export default {
         this.setTime(3);
         
         this.canvas = this.$refs.canvas; 
-                
         var context = this.canvas.getContext("2d").drawImage(this.video, 0, 0, 640, 480);
         this.captures.push(canvas.toDataURL("image/webp"));
         this.video = this.$refs.video;
