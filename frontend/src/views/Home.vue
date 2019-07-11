@@ -1,12 +1,19 @@
+
+
 <template>
   <div class="home">
-    <div class="home-header">
-      <h1>Welkom bij de<br />ilionx DevDays 2019</h1>
-      <h2>Laat weten dat je er bent!</h2>
-      <a class="button">Check nu in!</a>
-      <a class="button button-open-cam" v-on:click="showCam = !showCam">Take a photo!</a>
-    </div>
-    <Cam v-if="showCam"/> 
+
+   <div class="home-header">
+    <h1>
+      Welkom bij de
+      <br />ilionx DevDays 2019
+    </h1>
+    <h2>Laat weten dat je er bent!</h2>
+    <router-link @click="setIdInStorage()" class="button" to="/dialog">Check nu in!</router-link>
+    <a class="button button-open-cam" v-on:click="showCam = !showCam">Take a photo!</a>
+    <router-link class="button-small" to="/attendants">Wie zijn er allemaal?</router-link>
+  </div>
+  <Cam v-if="showCam"/>
   </div>
 </template>
 
@@ -18,6 +25,9 @@
   h2 {
     color: $color-secondary;
     font-size: 60px;
+  }
+  .home {
+    align-self: center;
   }
   .home-header{
     overflow-y: auto;
@@ -49,7 +59,8 @@
 
 
 <script>
-import Cam from '@/components/Cam.vue'
+import * as uuidv1 from "uuid/v1";
+import Cam from '@/components/Cam.vue';
 
 export default {
   name: 'home',
@@ -60,6 +71,11 @@ export default {
     return{
       showCam: false
     }
+  },
+  methods: {
+    setIdInStorage: () => {
+      sessionStorage.setItem("endBossId", uuidv1());
+    }
   }
-}
+};
 </script>

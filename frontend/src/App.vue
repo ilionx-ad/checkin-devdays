@@ -11,7 +11,7 @@
 
 <style lang="scss">
   .check-in {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -19,18 +19,18 @@
     background-image: url(assets/x-background.png);
     background-repeat: no-repeat;
     background-size: cover;
-    display: flex;
-    align-items: center;
-
     &__inner {
       max-width: $container;
       width: 100%;
+      height: 100%;
       margin: 0 auto;
-      padding: 70px 15px 0 15px;
+      padding: 150px 15px ;
     }
 
     &__content {
       width: 66.66667%;
+      display: flex;
+      min-height: 100%;
     }
   }
 </style>
