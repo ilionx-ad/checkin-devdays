@@ -1,10 +1,12 @@
 <template>
   <div class="home">
-    <h1>Welkom bij de<br />ilionx DevDays 2019</h1>
-    <h2>Laat weten dat je er bent!</h2>
-    <a class="button">Check nu in!</a>
-    <a class="button button-open-modal" id="show-modal" @click="showModal = true">Take a photo!</a>   
-    <Cam v-if="showModal" @show="showModal = false" v-on:close="showModal = false"/> 
+    <div class="home-header">
+      <h1>Welkom bij de<br />ilionx DevDays 2019</h1>
+      <h2>Laat weten dat je er bent!</h2>
+      <a class="button">Check nu in!</a>
+      <a class="button button-open-cam" v-on:click="showCam = !showCam">Take a photo!</a>
+    </div>
+    <Cam v-if="showCam"/> 
   </div>
 </template>
 
@@ -13,10 +15,12 @@
   h1, h2 {
     margin: 0;
   }
-
   h2 {
     color: $color-secondary;
     font-size: 60px;
+  }
+  .home-header{
+    overflow-y: auto;
   }
   a.button{
     -webkit-background-size: 20px 20px;
@@ -38,7 +42,7 @@
     min-width: 250px;
     text-align: left;
   }
-  a.button-open-modal{
+  a.button-open-cam{
     background: url(../assets/baseline_tag_faces_white_18dp.png) center right 30px no-repeat #E41D29 !important;
   }
 </style>
@@ -54,7 +58,7 @@ export default {
   },
   data(){
     return{
-      showModal: true
+      showCam: false
     }
   }
 }
