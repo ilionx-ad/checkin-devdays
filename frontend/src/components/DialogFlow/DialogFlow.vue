@@ -1,6 +1,6 @@
 
 <template>
-  <div>
+  <div style="width:100%;">
     <!-- Text input  -->
     <input
       :aria-label="(config.i18n[lang()] && config.i18n[lang()].inputTitle) || config.i18n[config.app.fallback_lang].inputTitle"
@@ -9,10 +9,10 @@
       :placeholder="(config.i18n[lang()] && config.i18n[lang()].inputTitle) || config.i18n[config.app.fallback_lang].inputTitle"
       v-model="query"
       @keypress.enter="submit()"
-    >
+    />
     <!-- Microphone Button -->
-    <br>
-    <br>
+    <br />
+    <br />
     <div
       :aria-label="(config.i18n[lang()] && config.i18n[lang()].microphoneTitle) || config.i18n[config.app.fallback_lang].microphoneTitle"
       :title="(config.i18n[lang()] && config.i18n[lang()].microphoneTitle) || config.i18n[config.app.fallback_lang].microphoneTitle"
@@ -21,21 +21,20 @@
       @click="micro = !micro"
     >
       <i class="material-icons" aria-hidden="true">Click here to enable mic</i>
-      
     </div>
-    <!-- Result -->
-    <br>
-    <div class="result">Show response: {{answer}}</div>
+
+    <Chat :response="answer" />
   </div>
 </template>
 
 
 <script>
 import * as uuidv1 from "uuid/v1";
+import Chat from "@/components/Chat/Chat.vue";
 
 export default {
   name: "dialogflow",
-  components: {},
+  components: { Chat },
   data() {
     return {
       app: null,
@@ -167,6 +166,8 @@ export default {
           this.handle(response); // <- trigger the handle function (explanation below)
           this.loading = false;
           this.answer = response;
+
+          this.$store.commit("add", response);
         });
     },
     handle(response) {
